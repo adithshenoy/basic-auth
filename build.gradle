@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}"
+}
+
+java {
+    sourceCompatibility(JavaVersion.VERSION_17)
+    targetCompatibility(JavaVersion.VERSION_17)
+}
+
+bootJar {
+    doFirst {
+        manifest {
+            attributes(
+                    'Implementation-Title': archiveBaseName,
+                    'Implementation-Version': archiveVersion,
+                    'Implementation-Timestamp': new Date(),
+                    'Spring-Boot-Version': springBootVersion
+            )
+        }
+    }
+    layered {
+        application {
+            intoLayer("spring-boot-loader") {
+                include "org/springframework/boot/loader/**"
+            }
+            intoLayer("application")
+        }
+        layerOrder = ["dependencies", "spring-boot-loader", "application"]
+    }
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.22'
+
+    // BOMs
+    annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    runtimeOnly platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    testAnnotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
+    //Spring boot
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
